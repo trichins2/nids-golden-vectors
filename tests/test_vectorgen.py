@@ -5,4 +5,4 @@ def test_pads_short_packet():
 
 def test_scale2_wraps_like_hardware():
     assert scale2_reference([2**30]) == [-2**31]
-    printf("wraps test")
+    print("wraps test")
