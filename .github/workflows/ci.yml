@@ -2,14 +2,18 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build image
-        run: docker build -t nids-gv .
+        run: docker build --build-arg PY=${{ matrix.python }} -t nids-gv .
       - name: Run tests
         run: docker run --rm nids-gv
