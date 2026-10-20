@@ -1,5 +1,6 @@
 # 1. start from an official base image (Debian + Python 3.12)
-FROM python:3.12-slim
+ARG PY=3.12
+FROM python:${PY}-slim
 # 2. like `cd /app`, created if missing
 WORKDIR /app
 # 3. copy ONLY the dependency list first...
