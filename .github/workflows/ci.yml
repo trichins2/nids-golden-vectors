@@ -17,3 +17,27 @@ jobs:
         run: docker build --build-arg PY=${{ matrix.python }} -t nids-gv .
       - name: Run tests
         run: docker run --rm nids-gv
+  deliver:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest .
+          docker push ghcr.io/${{ github.repository }}:latest
+      - name: Generate golden vectors
+        run: docker run --rm -v "$PWD/out:/app/out" ghcr.io/${{ github.repository }}:latest python -m src.generate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-vectors
+          path: out/
